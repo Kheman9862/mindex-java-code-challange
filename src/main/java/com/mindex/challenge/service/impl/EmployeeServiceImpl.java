@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -45,5 +47,27 @@ public class EmployeeServiceImpl implements EmployeeService {
         LOG.debug("Updating employee [{}]", employee);
 
         return employeeRepository.save(employee);
+    }
+
+    /**
+     *
+     * Obtaining total number of Reports given to a parent Employee
+     * by counting all the child nodes using recursion.
+     * @param EmployeeId: This is the id for which it will return the sum of nodes present.
+     * @return sum: This will give the total number of reports given to the head Employee.
+     *
+     * */
+
+    @Override
+    public int totalNumberOfReports(String EmployeeId) {
+        int sum = 0;
+        Employee employee = this.read(EmployeeId);
+        List<Employee> reports = employee.getDirectReports();
+        if (reports != null) {
+            for (int i=0;i<reports.size();i++) {
+                sum += (totalNumberOfReports(reports.get(i).getEmployeeId())+1);
+            }
+        }
+        return sum;
     }
 }
